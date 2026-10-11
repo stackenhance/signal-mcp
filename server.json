@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.stackenhance/signal",
+  "title": "Signal by StackEnhance",
+  "description": "How often 750+ e-commerce brands send marketing emails: counts, send dates, recent subject lines.",
+  "version": "1.2.0",
+  "websiteUrl": "https://stackenhance.com/signal",
+  "repository": {
+    "url": "https://github.com/stackenhance/signal-mcp",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://stackenhance.com/design-system/assets/favicon-512.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.stackenhance.com/mcp"
+    }
+  ]
+}

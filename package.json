@@ -1,0 +1,32 @@
+{
+  "name": "signal-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Signal by StackEnhance: a free, read-only MCP server for how often e-commerce brands in the Nordics and Germany send marketing email.",
+  "license": "MIT",
+  "homepage": "https://stackenhance.com/signal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stackenhance/signal-mcp"
+  },
+  "scripts": {
+    "dev": "tsx src/dev.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "tsx src/smoke.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "tsx": "^4.7.1",
+    "typescript": "^5.9.3",
+    "vitest": "4.1.11"
+  },
+  "overrides": {
+    "vitest": "4.1.11"
+  }
+}
