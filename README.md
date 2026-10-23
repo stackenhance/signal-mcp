@@ -13,7 +13,7 @@ Streamable HTTP · no API key · no sign-in · read-only · free
 ## What you can ask
 
 - *How often does Boozt email its customers in Sweden?*
-- *What did Newport send last week?*
+- *What did Lindex send last week?*
 - *How many emails did IKEA send in August?*
 - *Which home and interior brands in Denmark email most often?*
 - *Is Gina Tricot still sending newsletters?*
@@ -24,8 +24,8 @@ Every answer links to the brand's public page on stackenhance.com as its source.
 
 |                    |                                                                                                       |
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
-| **Brands**         | 750+ online stores, mostly in Sweden, Norway, Denmark, Finland and Germany                            |
-| **Emails**         | 75,000+ marketing emails captured                                                                     |
+| **Brands**         | 800+ online stores, mostly in Sweden, Norway, Denmark, Finland and Germany                            |
+| **Emails**         | 80,000+ marketing emails captured                                                                     |
 | **What counts**    | De-duplicated campaign sends. Welcome, birthday and transactional emails are excluded.                |
 | **Frequency**      | Average marketing emails per week over the last 90 days                                               |
 | **Dates**          | The brand's local calendar date                                                                       |
@@ -41,7 +41,7 @@ For a period of up to 31 days the server lists the date of each send. It may quo
 | `get_brand_email_frequency` | How many marketing emails a brand sent in a period, and on which days (periods up to 31 days)                      | `brand`, `from`, `to` (YYYY-MM-DD, up to two years), optional `market`     |
 | `find_brands`               | Brands in one market ranked by current email frequency, optionally within a category                                | `market` (SE, NO, DK, FI, DE), optional `category`, `limit` (1–10)          |
 
-All three are read-only and idempotent. A brand can be given by name (`Newport`) or domain (`newport.se`). Without a `market`, a brand sold in several countries returns one result per market.
+All three are read-only and idempotent. A brand can be given by name (`Lindex`) or domain (`lindex.com`). Without a `market`, a brand sold in several countries returns one result per market.
 
 ## Setup
 
@@ -52,6 +52,10 @@ Open **[Signal by StackEnhance in Claude's directory](https://claude.ai/director
 Or add it by hand: **Settings → Connectors → Add custom connector**, name it `Signal by StackEnhance`, paste the server URL and leave the OAuth fields empty.
 
 ### ChatGPT
+
+Open **[Signal by StackEnhance in ChatGPT's app directory](https://chatgpt.com/plugins/plugin_asdk_app_6ac8b32270388191b0dfcfae9d88c30a)** and add it.
+
+Or add it by hand:
 
 1. Open **Settings → Apps & Connectors → Advanced** and turn on **Developer mode**.
 2. Choose **Create**.

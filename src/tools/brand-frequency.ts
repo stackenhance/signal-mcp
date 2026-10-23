@@ -173,7 +173,7 @@ export function registerBrandFrequencyTool(server: McpServer, deps: ToolDeps): v
         'Use for questions like "How many emails did Newport send in August 2026?", "What did Newport send last week?" or "What has X sent recently?". ' +
         'Without a market, a brand tracked in several countries gets one result per market. ' +
         'Resolve relative dates yourself to YYYY-MM-DD: "last week" is the previous Monday–Sunday, "last month" the previous calendar month, "recently" the last 14 days. ' +
-        "Dates are the brand's local calendar dates and a period may span up to two years. " +
+        "Dates are the brand's local calendar dates. The period must start within the last six months (older history is in a Signal account) and may span up to two years. " +
         "Returns the count; for periods of up to 31 days also the date of each send; and at most two subject lines, only ones already shown on the brand's public StackEnhance page and sent in the period. " +
         'Every listed send was captured in full; a send without a quoted subject is listed in sends_with_subject_in_signal because its subject is withheld by that limit, not missing. ' +
         'Counts are de-duplicated marketing sends (welcome, birthday and transactional emails excluded). There is no open, click or revenue data. ' +
