@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.stackenhance/signal",
   "title": "Signal by StackEnhance",
-  "description": "How often 750+ e-commerce brands send marketing emails: counts, send dates, recent subject lines.",
+  "description": "How often 10,000+ e-commerce brands send marketing emails: counts, send dates, recent subject lines.",
   "version": "1.2.0",
   "websiteUrl": "https://stackenhance.com/signal",
   "repository": {

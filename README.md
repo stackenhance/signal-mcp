@@ -26,7 +26,7 @@ Every answer links to the brand's public page on stackenhance.com as its source.
 
 |                    |                                                                                                       |
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
-| **Brands**         | 800+ online stores, mostly in Sweden, Norway, Denmark, Finland and Germany                            |
+| **Brands**         | 10,000+ online stores, mostly in Sweden, Norway, Denmark, Finland and Germany                         |
 | **Emails**         | 80,000+ marketing emails captured                                                                     |
 | **What counts**    | De-duplicated campaign sends. Welcome, birthday and transactional emails are excluded.                |
 | **Frequency**      | Average marketing emails per week over the last 90 days                                               |
