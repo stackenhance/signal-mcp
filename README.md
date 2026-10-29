@@ -1,5 +1,7 @@
 # Signal by StackEnhance — MCP server
 
+[![mcptry](https://mcptry.com/badge/com.stackenhance/signal)](https://mcptry.com/servers/com.stackenhance/signal)
+
 **Marketing-email intelligence for e-commerce brands in the Nordics and Germany, inside your AI assistant.**
 
 Signal by StackEnhance is a free, read-only [Model Context Protocol](https://modelcontextprotocol.io) server. It lets Claude, ChatGPT, Cursor and other MCP clients answer questions about how often online stores send marketing email, and when, from the archive behind [StackEnhance Signal](https://stackenhance.com/signal).
