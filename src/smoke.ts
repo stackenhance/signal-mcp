@@ -26,7 +26,7 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 const url = process.argv[2] ?? 'http://localhost:3333/mcp';
 const withRate = process.argv.includes('--rate');
 
-const EXPECTED_TOOLS = ['find_brands', 'get_brand_email_frequency', 'get_brand_summary'];
+const EXPECTED_TOOLS = ['compare_brands', 'find_brands', 'get_brand_email_frequency', 'get_brand_summary'];
 const ALLOWED_KEYS = new Set([
   // frequency
   'brand',
@@ -55,6 +55,15 @@ const ALLOWED_KEYS = new Set([
   'results',
   'unavailable',
   'reason',
+  // market rank (v1.3) + compare_brands rows
+  'market_rank',
+  'rank',
+  'of',
+  'rate_basis',
+  'observed_last_6_months',
+  'latest_campaign_date',
+  'label',
+  'unavailable',
 ]);
 const PREMIUM_WORDS = /campaign_list|subject|body|html|discount|offer|product|creative|search|query|sql/i;
 
@@ -97,7 +106,7 @@ async function main(): Promise<void> {
   check('server identifies as Signal by StackEnhance', info?.title === 'Signal by StackEnhance', JSON.stringify(info));
   const { tools } = await client.listTools();
   const names = tools.map((t) => t.name).sort();
-  check('exactly the three public tools', JSON.stringify(names) === JSON.stringify(EXPECTED_TOOLS), names.join(', '));
+  check('exactly the four public tools', JSON.stringify(names) === JSON.stringify(EXPECTED_TOOLS), names.join(', '));
   check(
     'every tool is read-only',
     tools.every((t) => t.annotations?.readOnlyHint === true)
@@ -178,6 +187,20 @@ async function main(): Promise<void> {
       '3b frequency for the top fashion brand, last month',
       !r3b.isError && allowedOnly(r3b),
       text(r3b).split('\n')[0]
+    );
+  }
+
+  // ── 3c. A set in one call: the top two ranked brands side by side ──
+  if (brands.length >= 2) {
+    const r3c = await call('compare_brands', {
+      brands: [String(brands[0].brand), String(brands[1].brand)],
+      market: 'SE',
+    });
+    const rows = ((r3c.structuredContent ?? {}).results as unknown[]) ?? [];
+    check(
+      '3c compare_brands, two ranked SE brands → two rows',
+      !r3c.isError && rows.length === 2 && allowedOnly(r3c),
+      text(r3c).split('\n')[0]
     );
   }
 

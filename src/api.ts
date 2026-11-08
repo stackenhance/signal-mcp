@@ -8,6 +8,7 @@
  */
 
 import type { SignalMcpConfig } from './config.js';
+import { tagDetailsUrl } from './utm.js';
 
 const TIMEOUT_MS = 8_000;
 const USER_AGENT = 'signal-mcp/1.0 (+https://stackenhance.com/signal)';
@@ -58,7 +59,15 @@ export interface BrandSummaryFact {
   total_observed_emails: number;
   current_emails_per_week: number;
   latest_observed_campaign_date: string | null;
+  /** Position in the market's ranking by emails per week (the ranking `find_brands` lists); null when unranked. */
+  market_rank?: MarketRank | null;
   details_url: string;
+}
+
+export interface MarketRank {
+  rank: number;
+  of: number;
+  market: string;
 }
 
 export interface TopSendersFact {
@@ -105,8 +114,10 @@ export const SUMMARY_KEYS = [
   'total_observed_emails',
   'current_emails_per_week',
   'latest_observed_campaign_date',
+  'market_rank',
   'details_url',
 ] as const;
+const MARKET_RANK_KEYS = ['rank', 'of', 'market'] as const;
 const MATCH_KEYS = ['brand', 'market', 'category', 'slug', 'details_url', 'exact'] as const;
 const TOP_SENDER_KEYS = ['brand', 'category', 'emails_per_week', 'details_url'] as const;
 
@@ -198,11 +209,18 @@ export function createSignalApi(
   }
 
   const seg = encodeURIComponent;
+  /** THE one place a details_url is tagged (see utm.ts). */
+  const tag = (url: unknown): string => (typeof url === 'string' ? tagDetailsUrl(url, context) : '');
 
   return {
     async lookupBrand(name, market) {
       const body = (await get('/api/public/brand-lookup', { name, market })) as Record<string, unknown>;
-      const matches = Array.isArray(body.matches) ? body.matches.map((m) => pick<LookupMatch>(m, MATCH_KEYS)) : [];
+      const matches = Array.isArray(body.matches)
+        ? body.matches.map((m) => {
+            const match = pick<LookupMatch>(m, MATCH_KEYS);
+            return { ...match, details_url: tag(match.details_url) };
+          })
+        : [];
       const available = Array.isArray(body.available_markets)
         ? body.available_markets.filter((m): m is string => typeof m === 'string')
         : undefined;
@@ -231,10 +249,16 @@ export function createSignalApi(
               .slice(0, MAX_PUBLIC_SUBJECTS)
           : [];
       }
-      return fact;
+      return { ...fact, details_url: tag(fact.details_url) };
     },
     async summary(slug) {
-      return pick<BrandSummaryFact>(await get(`/api/public/brands/${seg(slug)}/summary`), SUMMARY_KEYS);
+      const fact = pick<BrandSummaryFact>(await get(`/api/public/brands/${seg(slug)}/summary`), SUMMARY_KEYS);
+      if ('market_rank' in fact) {
+        const r = pick<MarketRank>(fact.market_rank, MARKET_RANK_KEYS);
+        fact.market_rank =
+          Number.isInteger(r.rank) && Number.isInteger(r.of) && typeof r.market === 'string' ? r : null;
+      }
+      return { ...fact, details_url: tag(fact.details_url) };
     },
     async topSenders(market, category, limit) {
       const body = (await get(`/api/public/markets/${seg(market)}/top-senders`, { category, limit })) as Record<
@@ -247,7 +271,10 @@ export function createSignalApi(
         window_days: Number(body.window_days ?? 90),
         brands_tracked: Number(body.brands_tracked ?? 0),
         brands: Array.isArray(body.brands)
-          ? body.brands.map((b) => pick<TopSendersFact['brands'][number]>(b, TOP_SENDER_KEYS))
+          ? body.brands.map((b) => {
+              const brand = pick<TopSendersFact['brands'][number]>(b, TOP_SENDER_KEYS);
+              return { ...brand, details_url: tag(brand.details_url) };
+            })
           : [],
       };
     },

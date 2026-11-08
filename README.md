@@ -43,8 +43,9 @@ For a period of up to 31 days the server lists the date of each send. It may quo
 | `get_brand_summary`         | A brand's profile: market, category, first observed, total emails, current emails per week, latest campaign date   | `brand`, optional `market`                                                 |
 | `get_brand_email_frequency` | How many marketing emails a brand sent in a period, and on which days (periods up to 31 days)                      | `brand`, `from`, `to` (YYYY-MM-DD, up to two years), optional `market`     |
 | `find_brands`               | Brands in one market ranked by current email frequency, optionally within a category                                | `market` (SE, NO, DK, FI, DE), optional `category`, `limit` (1–10)          |
+| `compare_brands`            | 2-5 named brands side by side in one call: frequency, last 6 months, rank in market; optionally sends in a period | `brands` (2-5), optional `market`, `from`, `to`    |
 
-All three are read-only and idempotent. A brand can be given by name (`Lindex`) or domain (`lindex.com`). Without a `market`, a brand sold in several countries returns one result per market.
+All four are read-only and idempotent. A brand can be given by name (`Lindex`) or domain (`lindex.com`). Without a `market`, a brand sold in several countries returns one result per market.
 
 ## Setup
 

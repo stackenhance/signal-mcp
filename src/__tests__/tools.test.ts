@@ -1,7 +1,7 @@
 /**
  * The Signal MCP tools over an in-memory MCP connection, against a fake API.
  *
- * Pins: the tool surface (exactly three, read-only), the shape every result
+ * Pins: the tool surface (exactly four, read-only), the shape every result
  * carries, brand resolution (ambiguous / not tracked / wrong market), and that
  * a field the API should never have sent is dropped before it reaches ChatGPT.
  */
@@ -119,10 +119,15 @@ describe('server identity', () => {
 });
 
 describe('tool surface', () => {
-  it('exposes exactly the three read-only aggregate tools', async () => {
+  it('exposes exactly the four read-only aggregate tools', async () => {
     const client = await connect(fakeApi());
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual(['find_brands', 'get_brand_email_frequency', 'get_brand_summary']);
+    expect(tools.map((t) => t.name).sort()).toEqual([
+      'compare_brands',
+      'find_brands',
+      'get_brand_email_frequency',
+      'get_brand_summary',
+    ]);
     for (const t of tools) {
       expect(t.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false, openWorldHint: false });
       expect(t.outputSchema).toBeDefined();

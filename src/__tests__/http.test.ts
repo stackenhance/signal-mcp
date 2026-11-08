@@ -41,6 +41,7 @@ describe('handleMcpHttp', () => {
     expect(res.headers.get('content-type')).toContain('application/json');
     const body = (await res.json()) as { result: { tools: Array<{ name: string }> } };
     expect(body.result.tools.map((t) => t.name).sort()).toEqual([
+      'compare_brands',
       'find_brands',
       'get_brand_email_frequency',
       'get_brand_summary',

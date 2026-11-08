@@ -31,7 +31,8 @@ export function registerFindBrandsTool(server: McpServer, deps: ToolDeps): void 
         'Ecommerce brands StackEnhance Signal tracks in one market, ranked by current email frequency (average marketing emails per week over the last 90 days), ' +
         'optionally within a category such as "Fashion & Apparel" or "Home & Interior". ' +
         'Use for questions like "Which brands email most frequently in Swedish ecommerce?" or to find a brand when the user names a kind of brand ("a Swedish fashion brand"). ' +
-        'Rankings are available for SE, NO, DK, FI and DE. Brands with too little observed data are left out of rankings. ' +
+        'Rankings are available for SE, NO, DK, FI and DE only; `market` is a country, never a topic. Brands with too little observed data are left out of rankings. ' +
+        'To then compare some of the brands (or brands the user named), call compare_brands with their names. ' +
         'Returns brand names, categories and emails per week only. Each brand has a details_url to cite.',
       inputSchema: {
         market: z
@@ -39,7 +40,9 @@ export function registerFindBrandsTool(server: McpServer, deps: ToolDeps): void 
           .trim()
           .min(2)
           .max(32)
-          .describe('Country as a two-letter code (SE, NO, DK, FI or DE) or its name ("Sweden").'),
+          .describe(
+            'Country as a two-letter code (SE, NO, DK, FI or DE) or its name ("Sweden"). Not a topic or category: put that in `category`.'
+          ),
         category: z
           .string()
           .trim()
