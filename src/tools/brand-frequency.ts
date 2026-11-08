@@ -13,6 +13,8 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { EmailFrequencyFact } from '../api.js';
 import {
   READ_ONLY_ANNOTATIONS,
+  archiveLine,
+  withLine,
   defaultLog,
   describeApiError,
   describeUnresolved,
@@ -214,7 +216,16 @@ export function registerBrandFrequencyTool(server: McpServer, deps: ToolDeps): v
         );
         if (results.length === 0) {
           done(false, errorCode(firstError));
-          return toolError(describeApiError(firstError));
+          // A period older than the public six months is the archive's own question:
+          // say where it is answered (TEXT only; the error shape is unchanged).
+          const archive =
+            errorCode(firstError) === 'range_too_old'
+              ? archiveLine(
+                  resolved.matches.map((m) => ({ details_url: m.details_url })),
+                  'frequency'
+                )
+              : null;
+          return toolError(describeApiError(firstError) + withLine(archive));
         }
 
         let text: string;
@@ -228,6 +239,7 @@ export function registerBrandFrequencyTool(server: McpServer, deps: ToolDeps): v
             (withheld ? `\n${withheld}` : '') +
             `\nSignal has observed this brand since ${f.tracked_since}.` +
             (f.note ? ` ${f.note}` : '') +
+            withLine(archiveLine([{ details_url: f.details_url }], 'frequency')) +
             `\n${FULL_CAMPAIGNS} ${f.details_url}`;
         } else {
           const lines = results.map((f) => {
@@ -241,7 +253,13 @@ export function registerBrandFrequencyTool(server: McpServer, deps: ToolDeps): v
           for (const u of unavailable) lines.push(`- ${storefront(u.brand, u.market)}: ${u.reason}`);
           text =
             `${results[0].brand} marketing emails in ${humanPeriod(results[0].period)}, by market (observed by StackEnhance Signal):\n` +
-            `${lines.join('\n')}\n${FULL_CAMPAIGNS} ${results.map((f) => f.details_url).join(' · ')}`;
+            `${lines.join('\n')}\n${FULL_CAMPAIGNS} ${results.map((f) => f.details_url).join(' · ')}` +
+            withLine(
+              archiveLine(
+                results.map((f) => ({ details_url: f.details_url })),
+                'frequency'
+              )
+            );
         }
         done(true, undefined, results.length);
         return toolResult(text, { results: results.map(withWithheld), ...(unavailable.length ? { unavailable } : {}) });

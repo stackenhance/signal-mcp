@@ -182,6 +182,47 @@ export function describeApiError(error: unknown): string {
   return 'The Signal data API is temporarily unavailable. Please try again shortly.';
 }
 
+/**
+ * The "full archive" link (owner decision 2026-10-30): every public figure is
+ * the last six months; the archive behind `tracked_since` is sold by quote.
+ * `/full-archive/<slug>` on the same site as `details_url`, tagged so
+ * /admin/activity → "Archive interest" can count the click per surface and
+ * brand: utm_source=signal-mcp, utm_content=<tool>. TEXT only — the structured
+ * output keeps its reviewed fields. Twin of `fullArchiveHref` in
+ * `frontend/src/lib/fullArchive.ts` (a different package; pinned by tests).
+ */
+export type ArchiveTool = 'summary' | 'frequency';
+
+export function archiveUrl(detailsUrl: string, tool: ArchiveTool): string | null {
+  try {
+    const page = new URL(detailsUrl);
+    const slug = page.pathname.split('/').filter(Boolean).pop();
+    if (!slug) return null;
+    const u = new URL(`/full-archive/${slug}`, page.origin);
+    u.searchParams.set('utm_source', 'signal-mcp');
+    u.searchParams.set('utm_medium', 'ai-assistant');
+    u.searchParams.set('utm_campaign', 'full-archive');
+    u.searchParams.set('utm_content', tool);
+    return u.toString();
+  } catch {
+    return null;
+  }
+}
+
+/** "Full archive since 2019-01-01 (… full access, priced on request) → <url>", or null without a link. */
+export function archiveLine(
+  facts: Array<{ details_url: string; tracked_since?: string | null }>,
+  tool: ArchiveTool
+): string | null {
+  const urls = facts.map((f) => archiveUrl(f.details_url, tool)).filter((u): u is string => !!u);
+  if (urls.length === 0) return null;
+  const since = facts.length === 1 && facts[0].tracked_since ? ` since ${facts[0].tracked_since}` : '';
+  return `Full archive${since} (every email Signal has captured; full access, priced on request) → ${urls.join(' · ')}`;
+}
+
+/** `\n<line>` — or nothing, for an optional trailing line. */
+export const withLine = (line: string | null): string => (line ? `\n${line}` : '');
+
 export function errorCode(error: unknown): string {
   if (error instanceof SignalApiError) return error.code ?? `http_${error.status}`;
   return 'internal';

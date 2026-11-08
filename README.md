@@ -1,6 +1,7 @@
 # Signal by StackEnhance — MCP server
 
 [![mcptry](https://mcptry.com/badge/com.stackenhance/signal)](https://mcptry.com/servers/com.stackenhance/signal)
+[![Signal by StackEnhance — MCP server on AI Agents Listing](https://aiagentslisting.com/signal-by-stackenhance-mcp-server/badge.svg?claim=affee4457caec0e7e02a1035a4b4b649)](https://aiagentslisting.com/mcp/signal-by-stackenhance-mcp-server)
 
 **Marketing-email intelligence for e-commerce brands in the Nordics and Germany, inside your AI assistant.**
 
@@ -26,7 +27,7 @@ Every answer links to the brand's public page on stackenhance.com as its source.
 
 |                    |                                                                                                       |
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
-| **Brands**         | 10,000+ online stores, mostly in Sweden, Norway, Denmark, Finland and Germany                         |
+| **Brands**         | 13,000+ online stores, mostly in Sweden, Norway, Denmark, Finland and Germany                         |
 | **Emails**         | 80,000+ marketing emails captured                                                                     |
 | **What counts**    | De-duplicated campaign sends. Welcome, birthday and transactional emails are excluded.                |
 | **Frequency**      | Average marketing emails per week over the last 90 days                                               |

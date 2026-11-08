@@ -1,6 +1,7 @@
 /**
  * `get_brand_summary` — what Signal knows about a brand at a glance: market,
- * category, tracked since, total observed emails, current frequency, latest
+ * category, tracked since, emails observed in the last 6 months (the field
+ * keeps its reviewed name `total_observed_emails`), current frequency, latest
  * observed campaign DATE. Never a campaign itself. One summary per market
  * when a brand is tracked in several and none was named.
  */
@@ -12,6 +13,8 @@ import { brandInput, unavailableSchema } from './brand-frequency.js';
 import {
   READ_ONLY_ANNOTATIONS,
   SOURCE_LINE,
+  archiveLine,
+  withLine,
   defaultLog,
   describeApiError,
   describeUnresolved,
@@ -36,6 +39,22 @@ const summaryFactSchema = z.object({
   details_url: z.string(),
 });
 
+const FREQUENCY_WINDOW_DAYS = 90;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * What the weekly figure is an average OVER. The API counts it over the last
+ * 90 days, or since Signal began following the brand when that is later
+ * (backend `brandProfileData/frequency.ts`, 2026-11-04) — so a brand first
+ * observed 20 days ago must not be described as a 90-day average.
+ */
+export function rateBasis(trackedSince: string | null, now: Date = new Date()): string {
+  const t = trackedSince ? Date.parse(`${trackedSince}T00:00:00Z`) : NaN;
+  return Number.isFinite(t) && now.getTime() - t < FREQUENCY_WINDOW_DAYS * DAY_MS
+    ? `average since Signal began tracking it on ${trackedSince}`
+    : '90-day average';
+}
+
 /**
  * A brand with nothing observed in 90 days is stated as what Signal SAW, never
  * as "sends 0 emails a week": it may have stopped, or Signal may have stopped
@@ -44,7 +63,7 @@ const summaryFactSchema = z.object({
 function cadence(s: BrandSummaryFact): string {
   const latest = s.latest_observed_campaign_date ? `; the latest is dated ${s.latest_observed_campaign_date}` : '';
   return s.current_emails_per_week > 0
-    ? `about ${s.current_emails_per_week} marketing emails per week (90-day average)${latest}`
+    ? `about ${s.current_emails_per_week} marketing emails per week (${rateBasis(s.tracked_since)})${latest}`
     : `no marketing emails observed in the last 90 days${latest}`;
 }
 
@@ -57,7 +76,7 @@ export function registerBrandSummaryTool(server: McpServer, deps: ToolDeps): voi
       title: 'Brand email summary',
       description:
         "A brand's email-marketing profile as observed by StackEnhance Signal: market, category, the date Signal first observed it, " +
-        'total marketing emails observed, current frequency (average emails per week over the last 90 days) and the date of the latest observed campaign. ' +
+        'marketing emails observed in the last 6 months, current frequency (average emails per week over the last 90 days) and the date of the latest observed campaign. ' +
         'Use for questions like "How often does Newport email customers?" or "Is IKEA still sending newsletters?". ' +
         'Without a market, a brand tracked in several countries gets one summary per market. ' +
         "Returns aggregates only — no campaign list, subject lines, offers or creative analysis. Cite each result's details_url as the source.",
@@ -96,18 +115,20 @@ export function registerBrandSummaryTool(server: McpServer, deps: ToolDeps): voi
           const s = results[0];
           text =
             `${storefront(s.brand, s.market)}: ${cadence(s)}. ` +
-            `Signal has observed ${s.total_observed_emails} of its marketing emails${s.tracked_since ? ` since ${s.tracked_since}` : ''}.` +
+            `Signal observed ${s.total_observed_emails} of its marketing emails in the last 6 months${s.tracked_since ? ` (tracked since ${s.tracked_since})` : ''}.` +
             (s.category ? ` Category: ${s.category}.` : '') +
-            `\n${SOURCE_LINE} — campaign, content and competitive detail for ${s.brand}: ${s.details_url}`;
+            `\n${SOURCE_LINE} — campaign, content and competitive detail for ${s.brand}: ${s.details_url}` +
+            withLine(archiveLine([s], 'summary'));
         } else {
           const lines = results.map(
             (s) =>
-              `- ${storefront(s.brand, s.market)}: ${cadence(s)}; ${s.total_observed_emails} observed${s.tracked_since ? ` since ${s.tracked_since}` : ''} — ${s.details_url}`
+              `- ${storefront(s.brand, s.market)}: ${cadence(s)}; ${s.total_observed_emails} observed in the last 6 months${s.tracked_since ? ` (tracked since ${s.tracked_since})` : ''} — ${s.details_url}`
           );
           for (const u of unavailable) lines.push(`- ${storefront(u.brand, u.market)}: ${u.reason}`);
           text =
             `${results[0].brand} email activity by market (observed by StackEnhance Signal):\n${lines.join('\n')}\n` +
-            `${SOURCE_LINE} — each market's page has its campaign, content and competitive detail.`;
+            `${SOURCE_LINE} — each market's page has its campaign, content and competitive detail.` +
+            withLine(archiveLine(results, 'summary'));
         }
         done(true, undefined, results.length);
         return toolResult(text, { results, ...(unavailable.length ? { unavailable } : {}) });

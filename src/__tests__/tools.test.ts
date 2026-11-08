@@ -11,6 +11,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createSignalMcpServer } from '../server.js';
 import { SignalApiError, type SignalApi } from '../api.js';
+import { rateBasis } from '../tools/brand-summary.js';
 
 const NEWPORT_SE = {
   brand: 'Newport',
@@ -424,6 +425,13 @@ describe('get_brand_summary and find_brands', () => {
     ).callTool({ name: 'get_brand_summary', arguments: { brand: 'IKEA', market: 'SE' } })) as Result;
     expect(textOf(r)).toContain('no marketing emails observed in the last 90 days; the latest is dated 2026-03-16');
     expect(textOf(r)).not.toMatch(/about 0/);
+  });
+
+  it('names the basis of the rate: since tracking began for a brand followed under 90 days', () => {
+    const now = new Date('2026-11-04T12:00:00Z');
+    expect(rateBasis('2026-08-20', now)).toBe('average since Signal began tracking it on 2026-08-20');
+    expect(rateBasis('2019-01-01', now)).toBe('90-day average');
+    expect(rateBasis(null, now)).toBe('90-day average');
   });
 
   it('ranks a market', async () => {

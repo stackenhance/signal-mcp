@@ -41,7 +41,7 @@ export const SERVER_INSTRUCTIONS = [
   'Signal by StackEnhance answers questions about how often ecommerce brands send marketing email.',
   'Data: marketing emails observed by StackEnhance Signal for ecommerce brands, mostly in Sweden (SE), Norway (NO), Denmark (DK), Finland (FI) and Germany (DE).',
   'Counts are de-duplicated marketing sends; welcome, birthday and transactional emails are excluded. There is no open, click or revenue data.',
-  'Tools: get_brand_email_frequency (sends in a date range, with dates for short periods), get_brand_summary (tracked since, totals, current frequency), find_brands (brands in a market ranked by frequency).',
+  'Tools: get_brand_email_frequency (sends in a date range, with dates for short periods), get_brand_summary (tracked since, emails in the last 6 months, current frequency), find_brands (brands in a market ranked by frequency).',
   "Every result includes details_url, the brand's public page on stackenhance.com — cite it as the source.",
   "At most two subject lines are quoted per answer, and only ones already shown on the brand's public page. Full campaigns, offers, products and creative analysis are not available through this server.",
 ].join(' ');
